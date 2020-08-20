@@ -40,17 +40,19 @@ describe('TasksService', () => {
 
   describe('updateTaskStatus', () => {
     it('update a created task', () => {
-      expect(service.updateTaskStatus('4', TaskStatus.IN_PROGRESS)).toEqual({
-        ...newTaskInfo,
-        id: '4',
-        status: TaskStatus.IN_PROGRESS,
-      });
+      expect(service.updateTaskStatusById('4', TaskStatus.IN_PROGRESS)).toEqual(
+        {
+          ...newTaskInfo,
+          id: '4',
+          status: TaskStatus.IN_PROGRESS,
+        },
+      );
     });
   });
 
   describe('deleteTask', () => {
     it('delete a task by id', () => {
-      expect(service.deleteTask('4')).toEqual(deepCopiedTestTasks);
+      expect(service.deleteTaskById('4')).toEqual(deepCopiedTestTasks);
     });
   });
 });
