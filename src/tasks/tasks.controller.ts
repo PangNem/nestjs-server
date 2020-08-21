@@ -7,10 +7,13 @@ import {
   Body,
   Put,
   Delete,
+  ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { Task, TaskStatus } from './task.model';
 import { TaskStatusValidationPipe } from './pipes/tasks-status-validation.pipe';
+import { CreateTaskDTO } from './dto/create-task.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -28,8 +31,9 @@ export class TasksController {
 
   @Post('/')
   @HttpCode(201)
-  createTask(@Body() task: Task): Task {
-    return this.tasksService.createTask(task);
+  @UsePipes(ValidationPipe)
+  createTask(@Body('createTaskDTO') creatTaskDTO: CreateTaskDTO): Task {
+    return this.tasksService.createTask(creatTaskDTO);
   }
 
   @Put('/:id')
