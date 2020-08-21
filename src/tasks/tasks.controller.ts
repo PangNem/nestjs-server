@@ -32,8 +32,8 @@ export class TasksController {
   @Post('/')
   @HttpCode(201)
   @UsePipes(ValidationPipe)
-  createTask(@Body('createTaskDTO') creatTaskDTO: CreateTaskDTO): Task {
-    return this.tasksService.createTask(creatTaskDTO);
+  createTask(@Body() createTaskDTO: CreateTaskDTO): Task {
+    return this.tasksService.createTask(createTaskDTO);
   }
 
   @Put('/:id')
