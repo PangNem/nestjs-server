@@ -49,6 +49,13 @@ describe('TaskController (e2e)', () => {
     it('/tasks', () => {
       return request(app.getHttpServer())
         .put('/tasks/4')
+        .send({ status: TaskStatus.IN_PROGRESS + 'TEST' })
+        .expect(400);
+    });
+
+    it('/tasks', () => {
+      return request(app.getHttpServer())
+        .put('/tasks/4')
         .send({ status: TaskStatus.IN_PROGRESS })
         .expect(200);
     });
