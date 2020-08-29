@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: string;
+  status: TaskStatus;
 }
 
 export enum TaskStatus {
@@ -11,7 +11,7 @@ export enum TaskStatus {
   DONE = 'DONE',
 }
 
-export const testTasks = [
+export const testTasks: Task[] = [
   {
     id: '1',
     title: '1',
