@@ -27,7 +27,7 @@ export class TasksService {
     return task;
   }
 
-  updateTaskStatusById(id: string, status: string): Task {
+  updateTaskStatusById(id: string, status: TaskStatus): Task {
     const task = this.getTaskById(id);
     task.status = status;
 
