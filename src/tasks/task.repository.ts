@@ -1,4 +1,7 @@
-import { Repository } from 'typeorm';
+import { Repository, EntityRepository } from 'typeorm';
 import { Task } from './task.entity';
 
-export class TaskRepository extends Repository<Task> {}
+@EntityRepository(Task)
+export class TaskRepository extends Repository<Task> {
+  async createTask() {}
+}
