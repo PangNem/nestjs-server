@@ -24,12 +24,12 @@ describe('TasksController', () => {
   });
   describe('GET /tasks/:id', () => {
     it('sholud be return a task by id', () => {
-      expect(tasksController.getTaskById('1')).toEqual(deepCopiedTestTasks[0]);
+      expect(tasksController.getTaskById(1)).toEqual(deepCopiedTestTasks[0]);
     });
   });
 
   const newTaskInfo = { title: '4', description: '4' };
-  const newCreatedTask = { ...newTaskInfo, id: '4', status: TaskStatus.OPEN };
+  const newCreatedTask = { ...newTaskInfo, id: 4, status: TaskStatus.OPEN };
 
   describe('POST /tasks', () => {
     it('should be create a task', () => {
@@ -40,14 +40,14 @@ describe('TasksController', () => {
   describe('PUT /tasks', () => {
     it('should be update a task', () => {
       expect(
-        tasksController.updateTaskStatusById('1', TaskStatus.IN_PROGRESS),
+        tasksController.updateTaskStatusById(1, TaskStatus.IN_PROGRESS),
       ).toEqual({ ...testTasks[0], status: TaskStatus.IN_PROGRESS });
     });
   });
 
   describe('DELETE /tasks', () => {
     it('should be delete a task', () => {
-      expect(tasksController.deleteTaskById('4')).toEqual(deepCopiedTestTasks);
+      expect(tasksController.deleteTaskById(4)).toEqual(deepCopiedTestTasks);
     });
   });
 });

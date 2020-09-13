@@ -4,7 +4,7 @@ import { TaskStatus } from './task.model';
 @Entity()
 export class Task extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   title: string;
