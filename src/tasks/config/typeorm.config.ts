@@ -9,7 +9,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   port: process.env.RDS_PORT || dbConfig.port,
   username: process.env.RDS_USERNAME || dbConfig.username,
   password: process.env.RDS_PASSWORD || dbConfig.password,
-  database: process.env.RDS_DB_NAMe || dbConfig.database,
+  database: process.env.RDS_DB_NAME || dbConfig.database,
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
   synchronize: process.env.TYPEORM_SYNC || dbConfig.synchronize, // Schema 싱크 맞추는건데 프로덕션에서는 꺼두는게 좋다.
 };
