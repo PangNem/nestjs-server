@@ -1,58 +1,107 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
 import { testTasks, TaskStatus } from './task.model';
+import { TaskRepository } from './task.repository';
+import { NotFoundException } from '@nestjs/common';
+
+const mockTaskRepository = () => ({
+  getTasks: jest.fn(),
+  findOne: jest.fn(),
+  createTask: jest.fn(),
+  delete: jest.fn(),
+});
 
 describe('TasksService', () => {
-  let service: TasksService;
-
-  const deepCopiedTestTasks = Array.from(testTasks);
-  const newTaskInfo = { title: '4', description: '4' };
+  let tasksService, taskRepository;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [TasksService],
+    const module = await Test.createTestingModule({
+      providers: [
+        TasksService,
+        { provide: TaskRepository, useFactory: mockTaskRepository },
+      ],
     }).compile();
 
-    service = module.get<TasksService>(TasksService);
+    tasksService = await module.get<TasksService>(TasksService);
+    taskRepository = await module.get<TaskRepository>(TaskRepository);
   });
 
-  describe('getAllTasks', () => {
-    it('get all tasks from an temporary array', () => {
-      expect(service.getAllTasks()).toEqual(testTasks);
+  describe('getTask', () => {
+    it('gets all tasks from repository', async () => {
+      taskRepository.getTasks.mockResolvedValue('some value');
+      expect(taskRepository.getTasks).not.toHaveBeenCalled();
+      const result = await tasksService.getAllTasks();
+
+      expect(taskRepository.getTasks).toHaveBeenCalled();
+      expect(result).toEqual('some value');
     });
   });
 
   describe('getTaskById', () => {
-    it('get a task by id', () => {
-      expect(service.getTaskById('1')).toEqual(testTasks[0]);
+    it('throw an error if id not found', () => {
+      taskRepository.findOne.mockResolvedValue(null);
+      expect(tasksService.getTaskById(1)).rejects.toThrow(NotFoundException);
+    });
+    it('calls taskRepository.findOne() and return its task', async () => {
+      const mockTest = { title: 'test', description: 'test desc' };
+      taskRepository.findOne.mockResolvedValue(mockTest);
+
+      const result = await tasksService.getTaskById(1);
+      expect(result).toEqual(mockTest);
     });
   });
 
   describe('createTask', () => {
-    it('create a new task and return its task', () => {
-      expect(service.createTask(newTaskInfo)).toEqual({
-        ...newTaskInfo,
-        id: '4',
+    it('calls taskRepository.createTask() and return the result', async () => {
+      taskRepository.createTask.mockResolvedValue('new task');
+      expect(taskRepository.createTask).not.toBeCalled();
+
+      const createTaskDTO = { title: 'test', description: 'test desc' };
+      const result = await tasksService.createTask(createTaskDTO);
+
+      expect(taskRepository.createTask).toBeCalled();
+      expect(taskRepository.createTask).toBeCalledWith(createTaskDTO);
+
+      expect(result).toEqual('new task');
+    });
+  });
+
+  describe('deleteTaskById', () => {
+    it('throw an error if task could not be found', () => {
+      taskRepository.delete.mockResolvedValue({ affected: 0 });
+      expect(tasksService.deleteTaskById(1)).rejects.toThrow(NotFoundException);
+    });
+
+    it('calls taskRepository.delete() and check it called', async () => {
+      taskRepository.delete.mockResolvedValue({ affected: 1 });
+      expect(taskRepository.delete).not.toBeCalled();
+      await tasksService.deleteTaskById(1);
+
+      expect(taskRepository.delete).toBeCalled();
+      expect(taskRepository.delete).toBeCalledWith(1);
+    });
+  });
+
+  describe('updateTaskStatausById', () => {
+    it('calls taskRepository.getTaskById() and return saved task', async () => {
+      const save = jest.fn().mockResolvedValue(true);
+
+      tasksService.getTaskById = jest.fn().mockResolvedValue({
         status: TaskStatus.OPEN,
+        save,
       });
-    });
-  });
 
-  describe('updateTaskStatus', () => {
-    it('update a created task', () => {
-      expect(service.updateTaskStatusById('4', TaskStatus.IN_PROGRESS)).toEqual(
-        {
-          ...newTaskInfo,
-          id: '4',
-          status: TaskStatus.IN_PROGRESS,
-        },
+      expect(tasksService.getTaskById).not.toBeCalled();
+      expect(save).not.toBeCalled();
+
+      const result = await tasksService.updateTaskStatusById(
+        1,
+        TaskStatus.DONE,
       );
-    });
-  });
 
-  describe('deleteTask', () => {
-    it('delete a task by id', () => {
-      expect(service.deleteTaskById('4')).toEqual(deepCopiedTestTasks);
+      expect(tasksService.getTaskById).toBeCalled();
+      expect(result.status).toEqual(TaskStatus.DONE);
+      expect(save).toBeCalled();
     });
   });
 });
