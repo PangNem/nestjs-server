@@ -20,32 +20,32 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get('/')
-  getAllTasks(): Task[] {
+  getAllTasks(): Promise<Task[]> {
     return this.tasksService.getAllTasks();
   }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Task {
+  getTaskById(@Param('id') id: number): Promise<Task> {
     return this.tasksService.getTaskById(id);
   }
 
   @Post('/')
   @HttpCode(201)
   @UsePipes(ValidationPipe)
-  createTask(@Body() createTaskDTO: CreateTaskDTO): Task {
+  createTask(@Body() createTaskDTO: CreateTaskDTO): Promise<Task> {
     return this.tasksService.createTask(createTaskDTO);
   }
 
   @Put('/:id')
   updateTaskStatusById(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body('status', TaskStatusValidationPipe) status: TaskStatus,
-  ): Task {
+  ): Promise<Task> {
     return this.tasksService.updateTaskStatusById(id, status);
   }
 
   @Delete('/:id')
-  deleteTaskById(@Param('id') id: string): Task[] {
+  deleteTaskById(@Param('id') id: number): Promise<Task[]> {
     return this.tasksService.deleteTaskById(id);
   }
 }
