@@ -14,7 +14,7 @@ const mockTaskRepository = () => ({
 describe('TasksService', () => {
   let tasksService, taskRepository;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module = await Test.createTestingModule({
       providers: [
         TasksService,
@@ -54,31 +54,30 @@ describe('TasksService', () => {
   describe('createTask', () => {
     it('calls taskRepository.createTask() and return the result', async () => {
       taskRepository.createTask.mockResolvedValue('new task');
-      expect(taskRepository.createTask).not.toBeCalled();
+      expect(taskRepository.createTask).not.toHaveBeenCalled();
 
       const createTaskDTO = { title: 'test', description: 'test desc' };
       const result = await tasksService.createTask(createTaskDTO);
 
-      expect(taskRepository.createTask).toBeCalled();
-      expect(taskRepository.createTask).toBeCalledWith(createTaskDTO);
+      expect(taskRepository.createTask).toHaveBeenCalled();
+      expect(taskRepository.createTask).toHaveBeenCalledWith(createTaskDTO);
 
       expect(result).toEqual('new task');
     });
   });
 
   describe('deleteTaskById', () => {
+    it('calls taskRepository.delete() and check it called', async () => {
+      taskRepository.delete.mockResolvedValue({ affected: 1 });
+      expect(taskRepository.delete).not.toHaveBeenCalled();
+      await tasksService.deleteTaskById(1);
+
+      expect(taskRepository.delete).toHaveBeenCalled();
+      expect(taskRepository.delete).toHaveBeenCalledWith(1);
+    });
     it('throw an error if task could not be found', () => {
       taskRepository.delete.mockResolvedValue({ affected: 0 });
       expect(tasksService.deleteTaskById(1)).rejects.toThrow(NotFoundException);
-    });
-
-    it('calls taskRepository.delete() and check it called', async () => {
-      taskRepository.delete.mockResolvedValue({ affected: 1 });
-      expect(taskRepository.delete).not.toBeCalled();
-      await tasksService.deleteTaskById(1);
-
-      expect(taskRepository.delete).toBeCalled();
-      expect(taskRepository.delete).toBeCalledWith(1);
     });
   });
 
@@ -91,15 +90,15 @@ describe('TasksService', () => {
         save,
       });
 
-      expect(tasksService.getTaskById).not.toBeCalled();
-      expect(save).not.toBeCalled();
+      expect(tasksService.getTaskById).not.toHaveBeenCalled();
+      expect(save).not.toHaveBeenCalled();
 
       const result = await tasksService.updateTaskStatusById(
         1,
         TaskStatus.DONE,
       );
 
-      expect(tasksService.getTaskById).toBeCalled();
+      expect(tasksService.getTaskById).toHaveBeenCalled();
       expect(result.status).toEqual(TaskStatus.DONE);
       expect(save).toBeCalled();
     });
